@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+		<title>Mobin Host</title>
+    <link rel="icon" href="./mobinhostlogo.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="bootstrap.min.css">
+    <script src="bootstrap.bundle.min.js"></script>
+		<link href="material-components-web.min.css" rel="stylesheet">
+		<script src="material-components-web.min.js"></script>
+		<link rel="stylesheet" href="bundle.css">
+  </head>
+	<body>
+		<h1 class="header">HELLO</h1>
+		<form>
+			<label class="mdc-text-field mdc-text-field--filled username">
+				<span class="mdc-text-field__ripple"></span>
+				<input id="mongouser" type="text" class="mdc-text-field__input" aria-labelledby="username-label" name="username" required>
+				<span class="mdc-floating-label" id="username-label">Username</span>
+				<span class="mdc-line-ripple"></span>
+			</label>
+			<label class="mdc-text-field mdc-text-field--filled password">
+				<span class="mdc-text-field__ripple"></span>
+				<input id="mongopass" type="password" class="mdc-text-field__input" aria-labelledby="password-label" name="password" required>
+				<span class="mdc-floating-label" id="password-label">Password</span>
+				<span class="mdc-line-ripple"></span>
+			</label>
+			<div class="button-container">
+				<button type="button" class="mdc-button cancel">
+					<div class="mdc-button__ripple"></div>
+					<span class="mdc-button__label">Cancel</span>
+				</button>
+				<button type="button" class="mdc-button mdc-button--raised next" onclick="Login()">
+					<div class="mdc-button__ripple"></div>
+					<span class="mdc-button__label">Next</span>
+				</button>
+			</div>
+		</form>
+		<h1 id="x"></h1>
+		<h1 id="y"></h1>
+		<script>
+			const username = new mdc.textField.MDCTextField(document.querySelector('.username'));
+      const password = new mdc.textField.MDCTextField(document.querySelector('.password'));
+			mdc.ripple.MDCRipple.attachTo(document.querySelector('.next'));
+			mdc.ripple.MDCRipple.attachTo(document.querySelector('.cancel'));
+			function Login() {
+				let mongouser = document.getElementById( "mongouser" ).value ;
+				let mongopass = document.getElementById( "mongopass" ).value ;
+				let data = {
+					"Operation" : "Login" ,
+					"Username" : mongouser ,
+					"Password" : mongopass
+				};
+				let jsondata = JSON.stringify( data );
+				document.getElementById( "y" ).innerHTML = jsondata ;
+			}
+		</script>
+	</body>
+</html>
+
+<!--
+	<button class="foo-button mdc-button">
+			<div class="mdc-button__ripple"></div>
+			<span class="mdc-button__label">Button</span>
+		</button>
+		-------------
+@use '@material/button/mdc-button';
+@use '@material/button';
+
+.foo-button {
+  @include button.container-fill-color(darksalmon);
+}
+-->

@@ -1,0 +1,24 @@
+@use "@material/textfield/mdc-text-field";
+@use "@material/button/mdc-button";
+
+.header {
+  text-align: center;
+}
+
+.username,
+.password {
+  display: flex;
+  margin: 20px auto;
+  width: 300px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 300px;
+  margin: auto;
+}
+
+.button-container button {
+  margin: 3px;
+}
