@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<h1 id="x"></h1>
+		<script>
+			const url = "http://192.168.1.104:8000" ;
+			async function Auth( url , username , password ) {
+				let AuthData = {
+					"OP" : "AuthReq" ,
+					"username" : username ,
+					"password" : password
+				};
+				let JsonAuthData = JSON.stringify( AuthData );
+				let AuthResponse = await fetch( url , {
+					method: 'POST',
+					body: JsonAuthData
+				});
+				// let JsonAuthResponse = await AuthResponse.json();
+				// document.getElementById( "x" ).innerHTML = JsonAuthResponse.Result ;
+				document.getElementById( "x" ).innerHTML = await AuthResponse.text(); 
+			}
+			Auth( url , "sajjad" , "drama" );
+		</script>
+	</body>
+</html>
