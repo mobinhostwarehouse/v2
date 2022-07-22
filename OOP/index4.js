@@ -1,7 +1,7 @@
 const { MongoClient } = require("mongodb");
 
 async function MDBConnect() {
-    const MongoURL = "mongodb://127.0.0.1:27017/?compressors=zstd";
+    const MongoURL = "mongodb://127.0.0.1:27017/";
     const MongoDBclient = new MongoClient( MongoURL );
     await MongoDBclient.connect();
     return MongoDBclient
