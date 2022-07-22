@@ -1,0 +1,11 @@
+Scratch :
+
+$ npm init
+$ npm install --save material-components-web
+$ npm install --save-dev webpack webpack-cli css-loader sass-loader sass extract-loader file-loader autoprefixer postcss-loader
+$ npm start
+
+Import :
+
+$ npm install
+$ npm start
