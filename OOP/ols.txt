@@ -1,0 +1,149 @@
+$ sudo apt-get install gnupg
+$ curl -Lo server-6.0.asc https://www.mongodb.org/static/pgp/server-6.0.asc
+$ sudo apt-key add ./server-6.0.asc
+$ sudo nano /etc/apt/sources.list.d/mongodb-org-6.0.list :
+deb http://repo.mongodb.org/apt/debian buster/mongodb-org/6.0 main
+$ sudo apt update
+$ sudo apt-get install -y mongodb-org
+
+$ sudo systemctl start mongod
+$ sudo systemctl status mongod
+$ mongod --version
+$ sudo systemctl enable mongod
+
+URL : mongodb://127.0.0.1:27017/
+
+$ mongosh :
+$ db : pwd
+$ use [ db name ] : cd
+
+a mongo database instance has collections ( tables )
+a collection stores documents ( json objects )
+each doc is stored as the value of it's _id key
+id is random and unique
+
+------------------------------------------------------
+
+$ npm install mongodb
+
+const { MongoClient } = require("mongodb");
+const MyMongoURL = "mongodb://127.0.0.1:27017/";
+const client = new MongoClient( MyMongoURL );
+
+async function MDBConnect() {
+    await client.connect();
+    const database = client.db('DataBaseName');
+    const collection = database.collection('CollectionName');
+    const query = { username : 'sajjad' };
+    const doc = await collection.findOne( query );
+    await client.close();
+}
+
+// try { } catch ( error ) { } finally { await client.close(); }
+
+// edit :
+// .updateOne()
+// .updateMany()
+// .replaceOne() 
+
+// delete :
+// .deleteOne()
+// .deleteMany() 
+
+// https://www.mongodb.com/docs/manual/tutorial/getting-started/
+// https://www.mongodb.com/docs/manual/administration/security-checklist/
+// https://www.mongodb.com/docs/manual/core/security-hardening/
+// https://www.mongodb.com/docs/manual/crud/
+// https://www.mongodb.com/docs/manual/core/document/
+
+// https://www.w3schools.com/nodejs/nodejs_mongodb.asp
+// https://www.mongodb.com/blog/post/quick-start-nodejs-mongodb-how-to-get-connected-to-your-database
+// https://www.mongodb.com/docs/drivers/node/current/
+// https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/
+
+--------------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+
+sudo nano /etc/apt/sources.list.d/lst_debian_repo.list :
+deb http://rpms.litespeedtech.com/debian/ bullseye main
+
+sudo curl -Lo /etc/apt/trusted.gpg.d/lst_debian_repo.gpg http://rpms.litespeedtech.com/debian/lst_debian_repo.gpg
+sudo curl -Lo /etc/apt/trusted.gpg.d/lst_repo.gpg http://rpms.litespeedtech.com/debian/lst_repo.gpg
+
+sudo apt update
+
+sudo apt-get install openlitespeed
+
+/usr/local/lsws/bin/lshttpd -v
+sudo systemctl start lsws
+sudo systemctl status lsws
+sudo systemctl enable lsws
+
+sudo /usr/local/lsws/admin/misc/admpass.sh
+
+http://localhost:8088/
+https://localhost:7080/
+
+create A record with host server ip for the domain name
+the ssl cert , private key could be defined for both listener and virtual host
+to use node js with open lite speed , define ssl on listener 
+
+sudo mkdir /usr/local/lsws/[ Website Name ]
+sudo mkdir /usr/local/lsws/conf/vhosts/[ Website Name ]
+sudo chown lsadm:lsadm /usr/local/lsws/conf/vhosts/[ Website Name ] 
+
+Virtual Host -> Add -> {
+    Host Name , Root : [ Website Name ]
+    Conf File : conf/vhosts/[ Website Name ]/vhconf.conf
+    Restrained : YES
+}
+Virtual Host -> [ Website Name ] ( view ) -> {
+    General TAB - Doc Root : /usr/local/lsws/[ Website Name ]
+}
+
+Listeners -> Add -> {
+    General TAB : {
+        Address Settings :
+            Port : [ Port Number ]
+            Secure ( TLS ) : [ Yes / No ]
+        Virtual Host Mappings :
+            Domain : Website FQDN / *
+    }
+    SSL {
+        Private key : [ Privatekey.pem ADR  ] 
+        certificate : [ FullChain.pem ADR ]
+        Chained Certificate : YES
+    }
+}
+
+use Let’s Encrypt cert bot to generate ssl creds for the domain
+
+$ sudo apt install snapd
+$ sudo reboot
+$ sudo snap install core
+$ sudo snap refresh core
+$ sudo snap install hello-world
+$ sudo snap install --classic certbot
+$ sudo ln -s /snap/bin/certbot /usr/bin/certbot
+$ sudo systemctl stop lsws
+$ sudo certbot certonly --standalone ( WEB Root : /usr/local/lsws/[ Website Name ] ) => /etc/letsencrypt/live/[ Website Name ]/
+$ sudo nano /etc/cron.d/certbot
+append the following text to the line : --deploy-hook "systemctl restart lsws"
+$ sudo systemctl stop lsws
+
+
+
+Node JS Dir : /usr/local/lsws/[ Website Name ]/api/
+API URL : https://FQDN/api/
+
+Virtual Hosts -> Context -> Add {
+    Type : App Server
+    URI : /api/
+    Location = /usr/local/lsws/[ Website Name ]/api/
+    Binary Path = [ NodeJS BIN ADR ]
+    Application Type = node
+    Startup File = index.js
+}
+
+
