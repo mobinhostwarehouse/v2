@@ -1,7 +1,6 @@
 const { randomBytes } = require('crypto');
 const { createHash } = require('crypto');
 const http = require("http");
-const { isIPv4 } = require('net');
 
 function GetReqParse( GetReqQuery ) {
     GetReqQuery = GetReqQuery.slice( 1 , -1 );
