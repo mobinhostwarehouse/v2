@@ -58,111 +58,69 @@ function GenerateTimeStamp() {
 }
 
 function GenerateSubscription( SubscriptionUnit , SubscriptionUnitNumber ) {
-    let SubscriptionObj = {} ;
-    SubscriptionObj[ SubscriptionUnit ] = SubscriptionUnitNumber ;
-    return SubscriptionObj
-}
-
-function HoursCheck( ExpTimeStamp ) {
-    if( ExpTimeStamp.hour > 24 ) {
-        ExpTimeStamp.hour = ExpTimeStamp.hour - 24 ;
-        ExpTimeStamp.day = ExpTimeStamp.day + 1 ;
+    let SubscriptionDays = 0 ;
+    switch( SubscriptionUnit ) {
+        case "day" :
+            SubscriptionDays = SubscriptionUnitNumber ;
+            break ;
+        case "month" :
+            SubscriptionDays = SubscriptionUnitNumber * 30 ;
+            break ;
+        case "year" :
+            SubscriptionDays = SubscriptionUnitNumber * 360 ;
+            break ;
     }
+    return SubscriptionDays
 }
 
-function IsLeapYear( YearIndex ) {
+function IsLeapYear( Year ) {
     let LeapYear = false ;
-    if( YearIndex % 4  == 0 ) {
+    if( Year % 4  == 0 ) {
         LeapYear = true ;
     }
     return LeapYear
 }
 
-function MonthIndexDays( MonthIndex , YearIndex ) {
+function GetMonthDays( Month , Year ) {
 
     let MonthDays = 31 ; 
     let DifferentDayMonths = [ 2 , 4 , 6 , 9 , 11 ];
     let DifferentDayMonthsDays = [ 28 , 30 , 30 , 30 , 30 ];
-
-    if( IsLeapYear( YearIndex ) ) {
+    if( IsLeapYear( Year ) ) {
         DifferentDayMonthsDays[0] = 29 ;
     }
-
-    if( DifferentDayMonths.includes( MonthIndex ) ) {
-        for( let i = 0 ; i < 5 ; i++ ) {
-            if( MonthIndex ==  DifferentDayMonths[i] ) {
-                MonthDays = DifferentDayMonthsDays[i];
+    if( DifferentDayMonths.includes( Month ) ) {
+        for( let k = 0 ; k < 5 ; k++ ) {
+            if( Month ==  DifferentDayMonths[k] ) {
+                MonthDays = DifferentDayMonthsDays[k];
             }
         }
     }
-
     return MonthDays
 }
 
-function DaysCheck( ExpTimeStamp ) {
-
-    let ThisMonthDays = MonthIndexDays( ExpTimeStamp.month , ExpTimeStamp.year );
-    let NextMonthIndex = ExpTimeStamp.month + 1 ;
-    let NextMonthDays = MonthIndexDays( NextMonthIndex , ExpTimeStamp.year );
-
-    if( ExpTimeStamp.day > ThisMonthDays ) {
-        if( ( ExpTimeStamp.day - ThisMonthDays ) < NextMonthDays ) {
-            ExpTimeStamp.day = ExpTimeStamp.day - ThisMonthDays ;
-            ExpTimeStamp.month = ExpTimeStamp.month + 1 ;
-        } else {
-            ExpTimeStamp.day = ( ExpTimeStamp.day - ThisMonthDays ) - NextMonthDays ;
-            ExpTimeStamp.month = ExpTimeStamp.month + 2 ;
+function CalculateExpDate( PurchaseDate , SubscriptionDays ) {
+    let ExpTimeStamp = PurchaseDate ;
+    let FirstMonthDays = GetMonthDays( ExpTimeStamp.month , ExpTimeStamp.year ) - ExpTimeStamp.day ;
+    if( SubscriptionDays < FirstMonthDays ) {
+        ExpTimeStamp.day = ExpTimeStamp.day + SubscriptionDays ;
+    } else {
+        let SubscriptionRemainingDays = SubscriptionDays - FirstMonthDays ;
+        let SumNextMonthsDays = 0 ;
+        for( let i = ExpTimeStamp.month + 1 ; SubscriptionRemainingDays > SumNextMonthsDays ; i++ ) {
+            let NextMonthDays = GetMonthDays( i , ExpTimeStamp.year );
+            SumNextMonthsDays = SumNextMonthsDays + NextMonthDays ;
+            if( SubscriptionRemainingDays < SumNextMonthsDays ) {
+                ExpTimeStamp.month = i ;
+                ExpTimeStamp.day = NextMonthDays - ( SumNextMonthsDays - SubscriptionRemainingDays );
+                break ;
+            }
+            if( i == 12 ) {
+                ExpTimeStamp.year = ExpTimeStamp.year + 1 ;
+                i = 0 ;
+            }
         }
     }
-}
-
-function MonthsCheck( ExpTimeStamp ) {
-
-    if( ExpTimeStamp.month > 12 ) {
-        ExpTimeStamp.month =  ExpTimeStamp.month - 12 ;
-        ExpTimeStamp.year = ExpTimeStamp.year + 1 ;
-    }
-
-}
-
-function YearsCheck( ExpTimeStamp ) {
-    if( ExpTimeStamp.day == 29 && ExpTimeStamp.month == 2 && IsLeapYear( ExpTimeStamp.year ) == false ) {
-        ExpTimeStamp.day = 1 ;
-        ExpTimeStamp.month = 3 ;
-    }
-}
-
-function CalculateExpDate( TimeStamp , SubscriptionObj ) {
-    let ExpTimeStamp = TimeStamp ;
-    let SubscriptionUnit = Object.keys( SubscriptionObj )[0] ;
-    let SubscriptionUnitNumber = SubscriptionObj[ SubscriptionUnit ] ;
-
-    let CalculationUnits = [ "hour" , "day" , "month" , "year" ];
-    let TargetCalculationIndex = 0 ;
-    for( let i = 0 ; i < 4 ; i++ ) {
-        if( SubscriptionUnit ==  CalculationUnits[i] ) {
-            TargetCalculationIndex = i ;
-        }
-    }
-    let TargetCalculationUnits = CalculationUnits.slice( TargetCalculationIndex , );
-
-    ExpTimeStamp[ SubscriptionUnit ] = ExpTimeStamp[ SubscriptionUnit ] + SubscriptionUnitNumber ;
-
-    for( let i = 0 ; i < TargetCalculationUnits.length ; i++ ) {
-
-        let unit = TargetCalculationUnits[i] ;
-        switch( unit ) {
-            case "hour" :
-                HoursCheck( ExpTimeStamp );
-            case "day" :
-                DaysCheck( ExpTimeStamp );
-            case "month" :
-                MonthsCheck( ExpTimeStamp );
-            case "year" :
-                YearsCheck( ExpTimeStamp );
-        }
-    }
-
     return ExpTimeStamp
 }
 
