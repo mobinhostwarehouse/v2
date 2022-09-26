@@ -1,0 +1,91 @@
+Protocols : WireGuard , OPENVPN with directional static key , Shadowsocks + cloak 
+
+Python Installer :
+
+Welcome to VPN Installer
+Revision 1.0.0
+
+select protocols ports : [ openvpn tcp 443 , wireguard udp 443 , cloak shadow 50000-65000 ]
+
+block open ports with nft except service ports , ssh
+
+install wireguard , sudo , python pip requests , ... 
+
+Lists server nics , filter non loopbacks ,
+
+if link-local ( 169.x.x.x or fe80::x ) --> Enter ip , set ip on nic
+
+if private , api call to whatismyipservice , get pub ip address and location
+
+if public , ...
+
+server pri key is blake2s( server pub ip + secret )
+
+run an api on protocols ports returning "ok"
+make api req to pubip:port for port being open
+
+Enter vpn api domain :
+
+geolocate srv pub ipv4 address ,
+certificate pin the cloudflare doh domain ssl cert , ( cloudflare-dns.com )
+
+https://cloudflare-dns.com/dns-query?name= + [ fqdn ] + &type= + [ AAAA ] + ct=application/dns-json
+-->
+https://1.1.1.1/dns-query?name= + [ fqdn ] + &type= + [ AAAA ] + ct=application/dns-json
+
+make https get req to cf doh api with https://1.1.1.1 and auth with pinned cert
+find the vpn api and get encrypted servers name with http
+suggest a srv name based on location and last servers --> [ UK1 ]
+
+server pri key is blake2s( server pub ip + secret )
+for openvpn pri key is secp256r1
+
+
+
+CreateEncryptedClinetConfs()
+
+server : 10.0.0.1/21
+mask : 255.255.248.0
+10.0.0.1 - 10.0.7.254
+2048 clients
+fd00::00/117
+fd00::0000 - fd00::07ff
+
+private key wg : 32 bytes represented in Base64 encoding in 44 characters
+
+public key, a 32-byte Curve25519 point
+BLAKE2s
+
+Curve25519 for ECDH ,
+HKDF for expansion of ECDH results ,
+ChaCha20-Poly1305 for
+authenticated encryption, and BLAKE2s for hashing
+
+can encapsulate v4-in-v6 as well as v6-in-v4
+only 1 ipv4 or ipv6 is required for endpoint
+the client side should define both 0.0.0.0/0 , ::0
+
+client pri key is blake2s( client pri ip + secret )
+
+NodeJS HTTP API : ( Cloudflare CDN )
+
+ServeEncryptedConfsBasedOnUserPasswordForGolangClientApp()
+
+Flutter Golang Clinet APP :
+
+certificate pin the cloudflare doh domain ssl cert ,
+make https get req to cf doh api with https://1.1.1.1 and auth with pinned cert
+find the vpn api ip and get encrypted conf with http 
+
+
+---------------------------------------------------
+
+interface wireguard add name=itnet listen-port=443 private-key="SM9S3ip3A+aAhLwzLmEBtA+LQ6O+U1JQyu3Az4c0j2A="
+ip address add address=10.0.2.12/24 interface=itnet
+interface wireguard peers add public-key="6S+qPp48pvnxqTOl9Bd0jDvkdfeG19eZv7JRoko47nk=" endpoint-address=54.38.211.181 endpoint-port=55820 interface=itnet allowed-address=0.0.0.0/0
+ip route add dst-address=0.0.0.0/24 gateway=itnet
+
+
+https://github.com/BetterWayElectronics/secure-wireguard-implementation
+https://wiki.debian.org/SimplePrivateTunnelVPNWithWireGuard 
+
